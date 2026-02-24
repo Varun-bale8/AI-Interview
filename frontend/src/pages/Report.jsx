@@ -27,8 +27,8 @@ function Report() {
   };
 
   const getScoreColor = (score) => {
-    if (score >= 80) return '#4CAF50';
-    if (score >= 60) return '#FFA726';
+    if (score >= 8) return '#4CAF50';
+    if (score >= 6) return '#FFA726';
     return '#f44336';
   };
 
@@ -131,14 +131,14 @@ function Report() {
                   fill="none"
                   stroke={getScoreColor(report.overallScore)}
                   strokeWidth="20"
-                  strokeDasharray={`${(report.overallScore / 100) * 502.4} 502.4`}
+                  strokeDasharray={`${(report.overallScore / 10) * 502.4} 502.4`}
                   strokeLinecap="round"
                   transform="rotate(-90 100 100)"
                 />
               </svg>
               <div style={styles.scoreText}>
                 <div style={styles.scoreNumber}>{report.overallScore}</div>
-                <div style={styles.scoreLabel}>/ 100</div>
+                <div style={styles.scoreLabel}>/ 10</div>
               </div>
             </div>
             <div style={styles.performanceBadge}>
@@ -173,14 +173,14 @@ function Report() {
                       color: getScoreColor(item.score)
                     }}
                   >
-                    {item.score}%
+                    {item.score}/10
                   </span>
                 </div>
                 <div style={styles.progressBar}>
                   <div
                     style={{
                       ...styles.progressFill,
-                      width: `${item.score}%`,
+                      width: `${item.score * 10}%`,
                       backgroundColor: getScoreColor(item.score)
                     }}
                   />

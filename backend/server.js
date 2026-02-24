@@ -173,7 +173,20 @@ app.get('/api/interviews/user/:userId', async (req, res) => {
   }
 });
 
-// 7. Generate Interview Report API
+// 7. Delete Interview API
+app.delete('/api/interview/:interviewId', async (req, res) => {
+  try {
+    const interview = await Interview.findByIdAndDelete(req.params.interviewId);
+    if (!interview) {
+      return res.status(404).json({ message: 'Interview not found' });
+    }
+    res.json({ message: 'Interview deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// 8. Generate Interview Report API
 app.post('/api/interview/report/:interviewId', async (req, res) => {
   try {
     const interview = await Interview.findById(req.params.interviewId);
@@ -203,13 +216,13 @@ ${transcript}
 
 Provide a comprehensive analysis in the following JSON format (respond ONLY with valid JSON, no additional text):
 {
-  "overallScore": <number between 0-100>,
+  "overallScore": <number between 0-10>,
   "strengths": [<array of 3-5 key strengths>],
   "weaknesses": [<array of 3-5 areas for improvement>],
-  "technicalScore": <number between 0-100>,
-  "communicationScore": <number between 0-100>,
-  "confidenceScore": <number between 0-100>,
-  "problemSolvingScore": <number between 0-100>,
+  "technicalScore": <number between 0-10>,
+  "communicationScore": <number between 0-10>,
+  "confidenceScore": <number between 0-10>,
+  "problemSolvingScore": <number between 0-10>,
   "detailedFeedback": "<comprehensive feedback paragraph>",
   "recommendations": [<array of 3-5 specific recommendations>],
   "questionsAsked": <number of questions asked by interviewer>,
@@ -231,13 +244,13 @@ Provide a comprehensive analysis in the following JSON format (respond ONLY with
     } catch (parseError) {
       // If parsing fails, return a default structure
       reportData = {
-        overallScore: 70,
+        overallScore: 7,
         strengths: ["Completed the interview", "Responded to questions", "Showed engagement"],
         weaknesses: ["Could provide more detailed responses"],
-        technicalScore: 70,
-        communicationScore: 70,
-        confidenceScore: 70,
-        problemSolvingScore: 70,
+        technicalScore: 7,
+        communicationScore: 7,
+        confidenceScore: 7,
+        problemSolvingScore: 7,
         detailedFeedback: "The interview was conducted successfully. Continue practicing to improve your skills.",
         recommendations: ["Practice more technical questions", "Improve response clarity", "Research the company thoroughly"],
         questionsAsked: interview.chatTranscript.filter(c => c.role === 'ai').length,
@@ -320,7 +333,11 @@ ${interview.resumeText.substring(0, 2000)}
 
 User said: "${message}"
 
-Respond professionally as an interviewer. Ask relevant technical or behavioral questions based on the candidate's resume and the position. Keep responses concise and conversational.`;
+Respond professionally as an interviewer. Follow these rules STRICTLY:
+1. Ask ONLY ONE question at a time.
+2. Keep your response very concise (maximum 2-3 sentences).
+3. Do not only ask questions about the resume. Also ask general technical, situational, and behavioral questions related to the ${interview.position} role.
+4. Wait for the user to answer before asking the next question.`;
 
       const result = await model.generateContent(prompt);
       const aiResponse = result.response.text();
